@@ -26,8 +26,8 @@ class ACLAnthologyParser(PaperRepoParser):
         simply by adding a slash).  Return normalized URL."""
         match = self.url_matchers["pdf"].match(url)
         if match:
-            if url[-1] != "/":
-                url += "/"
+            if url[-1] == "/":
+                url = url[:-1]
         return url
 
     def parse(self, url):
