@@ -1,9 +1,17 @@
-import argparse, json
+import argparse, json, requests
 from ArXivParser import ArXivParser
 from ACLAnthologyParser import ACLAnthologyParser
 
 """ Take list of Twitter statuses (in JSON text format), extract URLs
 belonging to certain domains (arXiv, ACL Anthology). """
+
+def expand_short_url(url):
+    r = requests.get(url, allow_redirects=False)
+    try:
+        return r.headers['location']
+    except KeyError:
+        print(url, "Page doesn't exist!")
+        return None
 
 def extract_urls_from_status_first_level(status):
     """ Extract URLs from a Twitter status, without looking at any quoted statuses. """
@@ -50,25 +58,36 @@ def main():
         date = extract_date_from_status(status)
         urls = extract_urls_from_status(status, include_quoted=True)
         for url in urls:
+            # Expand if this is a t.co link
+            if len(url) > 13 and url[:13] == "https://t.co/":
+                print("hello")
+                url = expand_short_url(url)
+                if url == None:
+                    continue
+                else:
+                    print(url)
             data.append((user,date,url))
-                
+            
     # Filter URLs by domain
-    urls = []
+    urls = {k:[] for k in parsers.keys()}
     seen_urls = set()
     for user,date,url in data:
         if url not in seen_urls:
             seen_urls.add(url)
-            for parser_name in ["arxiv", "acl"]:
+            for parser_name in parsers.keys():
                 if parsers[parser_name].match_url(url):
-                    urls.append(parsers[parser_name].normalize_url(url))
+                    urls[parser_name].append(parsers[parser_name].normalize_url(url))
                     break
-    print("Found {} URLs matching ACL Anthology or ArXiv domains.".format(len(urls)))
+    print("Found {} relevant URLs".format(len(urls)))
+    for k,v in urls.items():
+        print("  - {}: {}".format(k, len(v)))
 
     # Write URLs
-    urls = sorted(urls)
     with open(args.output_path, "w") as f:
-        for url in urls:
-            f.write("{}\n".format(url))
+        for k,v in urls.items():
+            urls = sorted(v)
+            for url in urls:
+                f.write("{}\n".format(url))
     print("Wrote URLs --> {}".format(args.output_path))
 
 if __name__ == "__main__":

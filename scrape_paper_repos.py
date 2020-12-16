@@ -29,7 +29,7 @@ def main():
         # Check if one of the parsers handled the URL
         if meta is None:
             msg = "ERROR: URL '{}' does not match known formats (ArXiv and ACL Anthology).".format(url)
-            sys.stdout.write(print_format % msg)
+            sys.stderr.write(print_format % msg)
             continue
 
         # Check data types in metadata
