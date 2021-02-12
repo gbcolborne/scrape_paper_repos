@@ -6,28 +6,30 @@ class ACLAnthologyParser(PaperRepoParser):
 
     def __init__(self):
         self.url_matchers = {}
-        self.url_matchers["pdf"] = re.compile("(https?://)www.aclweb.org/anthology/[A-Z]\d{2}-\d{4}/?")
-        self.url_matchers["landing"] = re.compile("(https?://)(www.)?aclweb.org/anthology/papers/[A-Z]/[A-Z]\d{2}/[A-Z]\d{2}-\d{4}/?")
+        self.url_matchers["landing"] = re.compile("(https?://)www.aclweb.org/anthology/.+")
+
 
     def match_url(self, url):
         """ Match URL against known URL formats for the ACL
         Anthology. There are 2 URL formats. Return whichever one
         matches first."""
-        match = self.url_matchers["pdf"].match(url)
-        if match:
-            return match
-        match = self.url_matchers["landing"].match(url)
+        match = None
+        for t in ["landing"]:
+            candidate_match = self.url_matchers[t].match(url)
+            if candidate_match:
+                match = candidate_match
+                break
         return match
 
     def normalize_url(self, url):
-        """ Normalize URL, assuming it matches a known ACL Anthology
-        URL format. If the query matches the URL format for PDFs,
-        change it so that it points to the metadata page (we can do so
-        simply by adding a slash).  Return normalized URL."""
-        match = self.url_matchers["pdf"].match(url)
-        if match:
-            if url[-1] == "/":
-                url = url[:-1]
+        """Normalize URL, assuming it matches a known ACL Anthology URL
+        format. If the query matches the URL format for PDFs, change
+        it so that it points to the metadata page.  Return normalized
+        URL.
+
+        """
+        if url[-4:] == '.pdf':
+            url = url[:-4]
         return url
 
     def parse(self, url):

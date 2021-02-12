@@ -60,7 +60,6 @@ def main():
         for url in urls:
             # Expand if this is a t.co link
             if len(url) > 13 and url[:13] == "https://t.co/":
-                print("hello")
                 url = expand_short_url(url)
                 if url == None:
                     continue
