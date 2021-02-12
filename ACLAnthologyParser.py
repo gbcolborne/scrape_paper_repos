@@ -30,6 +30,8 @@ class ACLAnthologyParser(PaperRepoParser):
         """
         if url[-4:] == '.pdf':
             url = url[:-4]
+        if url[-1] == '/':
+            url = url[:-1]
         return url
 
     def parse(self, url):
