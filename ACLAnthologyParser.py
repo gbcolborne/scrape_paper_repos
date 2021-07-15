@@ -6,13 +6,8 @@ class ACLAnthologyParser(PaperRepoParser):
 
     def __init__(self):
         self.url_matchers = {}
-<<<<<<< HEAD
         self.url_matchers["pdf"] = re.compile("(https?://)(www.)?aclanthology.org/.+\.pdf")
         self.url_matchers["landing"] = re.compile("(https?://)(www.)?aclanthology.org/.+")        
-=======
-        self.url_matchers["landing"] = re.compile("(https?://)www.aclweb.org/anthology/.+")
-
->>>>>>> 845d1e18f9c41db894be7fd2f9ee7758d3333aef
 
     def match_url(self, url):
         """ Match URL against known URL formats for the ACL
@@ -33,16 +28,10 @@ class ACLAnthologyParser(PaperRepoParser):
         URL.
 
         """
-<<<<<<< HEAD
-        match = self.url_matchers["pdf"].match(url)
-        if match:
-            url = url[:-4]
-=======
         if url[-4:] == '.pdf':
             url = url[:-4]
         if url[-1] == '/':
             url = url[:-1]
->>>>>>> 845d1e18f9c41db894be7fd2f9ee7758d3333aef
         return url
 
     def parse(self, url):
